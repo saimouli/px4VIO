@@ -76,10 +76,10 @@ void Snapdragon::VislamManager::ImuCallback(
   // Parse IMU message
   float lin_acc[3], ang_vel[3];
 
-  // Convert ENU to NED coordinates
-  lin_acc[0] = msg->linear_acceleration.x;
-  lin_acc[1] = msg->linear_acceleration.y;
-  lin_acc[2] = msg->linear_acceleration.z;
+  // Convert RAW IMU to correct scale
+  lin_acc[0] = msg->linear_acceleration.x/1000.0;
+  lin_acc[1] = msg->linear_acceleration.y/1000.0;
+  lin_acc[2] = msg->linear_acceleration.z/1000.0;
   ang_vel[0] = msg->angular_velocity.x;
   ang_vel[1] = msg->angular_velocity.y;
   ang_vel[2] = msg->angular_velocity.z;
