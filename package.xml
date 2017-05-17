@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
 <package>
-  <name>snap_ros_examples</name>
+  <name>rpg_qualcomm_vislam</name>
   <version>0.1.1</version>
-  <description>This package provides example code as ros nodes for select features of snapdragon flight platfrom(TM)</description>
+  <description>
+    Private fork of the Qualcomm Vislam example code from ATLFlight 
+    (https://github.com/ATLFlight/ros-examples) for use with the Snapdragon Flight
+  </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="rkintada@gmail.com">rkintada</maintainer>
+  <maintainer email="potaito@TODO.com">potaito</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
