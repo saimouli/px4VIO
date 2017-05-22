@@ -77,7 +77,7 @@ public:
   /**
    * Constructor
    **/
-  VislamManager();
+  VislamManager(ros::NodeHandle nh);
 
   /**
    * Initalizes the VISLAM Manager with Camera and VISLAM Parameters

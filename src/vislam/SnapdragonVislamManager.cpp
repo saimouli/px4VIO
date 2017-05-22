@@ -32,7 +32,7 @@
 #include "SnapdragonVislamManager.hpp"
 #include "SnapdragonDebugPrint.h"
 
-Snapdragon::VislamManager::VislamManager() {
+Snapdragon::VislamManager::VislamManager(ros::NodeHandle nh) {
   cam_man_ptr_ = nullptr;
   // imu_man_ptr_ = nullptr;
   vislam_ptr_ = nullptr;
@@ -41,7 +41,7 @@ Snapdragon::VislamManager::VislamManager() {
   image_buffer_ = nullptr;
   
   // Setup publishers/subscribers
-  // imu_sub_ = nh_.subscribe<sensor_msgs::Imu> ("mavros/imu/data_raw", 10, callback_imu);
+  // imu_sub_ = nh.subscribe<sensor_msgs::Imu> ("mavros/imu/data_raw", 10, callback_imu);
 }
 
 Snapdragon::VislamManager::~VislamManager() {

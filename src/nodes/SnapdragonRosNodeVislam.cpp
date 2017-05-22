@@ -161,7 +161,7 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
   cpaConfig.legacyCost.gainCost = 0.3333f;
 
   param.mv_cpa_config = cpaConfig;   
-  Snapdragon::VislamManager vislam_man;
+  Snapdragon::VislamManager vislam_man(nh_);
   if( vislam_man.Initialize( param, vislamParams ) != 0  ) {
     ROS_WARN_STREAM( "Snapdragon::RosNodeVislam::VislamThreadMain: Error initializing the VISLAM Manager " );
     thread_started_ = false;
@@ -273,4 +273,3 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
   static tf2_ros::TransformBroadcaster br;
   br.sendTransform(transforms);     
 }
-
