@@ -34,25 +34,34 @@
 
 Snapdragon::VislamManager::VislamManager() {
   cam_man_ptr_ = nullptr;
-  imu_man_ptr_ = nullptr;
+  // imu_man_ptr_ = nullptr;
   vislam_ptr_ = nullptr;
   initialized_ = false;
   image_buffer_size_bytes_ = 0;
   image_buffer_ = nullptr;
+  
+  // Setup publishers/subscribers
+  // imu_sub_ = nh_.subscribe<sensor_msgs::Imu> ("mavros/imu/data_raw", 10, callback_imu);
 }
 
 Snapdragon::VislamManager::~VislamManager() {
   CleanUp();
 }
 
+void Snapdragon::VislamManager::callback_imu(
+    const sensor_msgs::Imu::ConstPtr& msg)
+{
+  // TODO: Process IMU message
+}
+
 int32_t Snapdragon::VislamManager::CleanUp() {
   // stop the imu api first.
-  if( imu_man_ptr_ != nullptr ) {
-    imu_man_ptr_->RemoveHandler( this );
-    imu_man_ptr_->Terminate();
-    delete imu_man_ptr_;
-    imu_man_ptr_ = nullptr;
-  }
+  // if( imu_man_ptr_ != nullptr ) {
+  //   imu_man_ptr_->RemoveHandler( this );
+  //   imu_man_ptr_->Terminate();
+  //   delete imu_man_ptr_;
+  //   imu_man_ptr_ = nullptr;
+  // }
 
   //stop the camera.
   if( cam_man_ptr_ != nullptr ) {
@@ -95,16 +104,16 @@ int32_t Snapdragon::VislamManager::Initialize
     }
   }
 
-  if( rc == 0 ) { //initialize the Imu Manager.
-    imu_man_ptr_ = new Snapdragon::ImuManager();
-    if( imu_man_ptr_ != nullptr ) {
-      rc = imu_man_ptr_->Initialize();
-      imu_man_ptr_->AddHandler( this );
-    }
-    else {
-      rc = -1;
-    }
-  }
+  // if( rc == 0 ) { //initialize the Imu Manager.
+  //   imu_man_ptr_ = new Snapdragon::ImuManager();
+  //   if( imu_man_ptr_ != nullptr ) {
+  //     rc = imu_man_ptr_->Initialize();
+  //     imu_man_ptr_->AddHandler( this );
+  //   }
+  //   else {
+  //     rc = -1;
+  //   }
+  // }
 
   //now intialize the VISLAM module.
   if( rc == 0 ) {
@@ -139,7 +148,7 @@ int32_t Snapdragon::VislamManager::Start() {
   int32_t rc = 0;
   if( initialized_ ) {
     //start the camera
-    rc =  imu_man_ptr_->Start();
+    // rc =  imu_man_ptr_->Start();
     rc |= cam_man_ptr_->Start();
 
     //wait till we get the first frame.
@@ -174,67 +183,68 @@ bool Snapdragon::VislamManager::HasUpdatedPointCloud() {
   return (mv_ret != 0 );
 }
 
-int32_t Snapdragon::VislamManager::Imu_IEventListener_ProcessSamples( sensor_imu* imu_samples, uint32_t sample_count ) {
-  int32_t rc = 0;
-  for (int ii = 0; ii < sample_count; ++ii)
-  {
-    int64_t current_timestamp_ns = (int64_t)imu_samples[ii].timestamp_in_us * 1000;
-
-    float delta = 0.f;
-    static int64_t last_timestamp = 0;
-    if (last_timestamp != 0)
-    {
-      delta = (current_timestamp_ns - last_timestamp)*1e-6;
-      const float imu_sample_dt_reasonable_threshold_ms = 2.5;
-      if (delta > imu_sample_dt_reasonable_threshold_ms)
-      {
-        if (cam_params_.verbose)
-        {
-          WARN_PRINT("IMU sample dt > %f ms -- %f ms",
-              imu_sample_dt_reasonable_threshold_ms,
-              delta);
-        }
-      }
-    }
-    last_timestamp = current_timestamp_ns;
-
-    float lin_acc[3], ang_vel[3];
-    const float kNormG = 9.80665f;
-    lin_acc[0] = imu_samples[ii].linear_acceleration[0] * kNormG;
-    lin_acc[1] = imu_samples[ii].linear_acceleration[1] * kNormG;
-    lin_acc[2] = imu_samples[ii].linear_acceleration[2] * kNormG;
-    ang_vel[0] = imu_samples[ii].angular_velocity[0];
-    ang_vel[1] = imu_samples[ii].angular_velocity[1];
-    ang_vel[2] = imu_samples[ii].angular_velocity[2];
-
-    static uint32_t sequence_number_last = 0;
-    int num_dropped_samples = 0;
-    if (sequence_number_last != 0)
-    {
-      // The diff should be 1, anything greater means we dropped samples
-      num_dropped_samples = imu_samples[ii].sequence_number
-        - sequence_number_last - 1;
-      if (num_dropped_samples > 0)
-      {
-        if (cam_params_.verbose)
-        {
-          WARN_PRINT("Current IMU sample = %u, last IMU sample = %u",
-              imu_samples[ii].sequence_number, sequence_number_last);
-        }
-      }
-    }
-    sequence_number_last = imu_samples[ii].sequence_number;
-
-    {
-      std::lock_guard<std::mutex> lock( sync_mutex_ );
-      mvVISLAM_AddAccel(vislam_ptr_, current_timestamp_ns,
-          lin_acc[0], lin_acc[1], lin_acc[2]);
-      mvVISLAM_AddGyro(vislam_ptr_, current_timestamp_ns,
-          ang_vel[0], ang_vel[1], ang_vel[2]);
-    }
-  }  
-  return rc;
-}
+// TODO: Use mavros instead!
+// int32_t Snapdragon::VislamManager::Imu_IEventListener_ProcessSamples( sensor_imu* imu_samples, uint32_t sample_count ) {
+//   int32_t rc = 0;
+//   for (int ii = 0; ii < sample_count; ++ii)
+//   {
+//     int64_t current_timestamp_ns = (int64_t)imu_samples[ii].timestamp_in_us * 1000;
+// 
+//     float delta = 0.f;
+//     static int64_t last_timestamp = 0;
+//     if (last_timestamp != 0)
+//     {
+//       delta = (current_timestamp_ns - last_timestamp)*1e-6;
+//       const float imu_sample_dt_reasonable_threshold_ms = 2.5;
+//       if (delta > imu_sample_dt_reasonable_threshold_ms)
+//       {
+//         if (cam_params_.verbose)
+//         {
+//           WARN_PRINT("IMU sample dt > %f ms -- %f ms",
+//               imu_sample_dt_reasonable_threshold_ms,
+//               delta);
+//         }
+//       }
+//     }
+//     last_timestamp = current_timestamp_ns;
+// 
+//     float lin_acc[3], ang_vel[3];
+//     const float kNormG = 9.80665f;
+//     lin_acc[0] = imu_samples[ii].linear_acceleration[0] * kNormG;
+//     lin_acc[1] = imu_samples[ii].linear_acceleration[1] * kNormG;
+//     lin_acc[2] = imu_samples[ii].linear_acceleration[2] * kNormG;
+//     ang_vel[0] = imu_samples[ii].angular_velocity[0];
+//     ang_vel[1] = imu_samples[ii].angular_velocity[1];
+//     ang_vel[2] = imu_samples[ii].angular_velocity[2];
+// 
+//     static uint32_t sequence_number_last = 0;
+//     int num_dropped_samples = 0;
+//     if (sequence_number_last != 0)
+//     {
+//       // The diff should be 1, anything greater means we dropped samples
+//       num_dropped_samples = imu_samples[ii].sequence_number
+//         - sequence_number_last - 1;
+//       if (num_dropped_samples > 0)
+//       {
+//         if (cam_params_.verbose)
+//         {
+//           WARN_PRINT("Current IMU sample = %u, last IMU sample = %u",
+//               imu_samples[ii].sequence_number, sequence_number_last);
+//         }
+//       }
+//     }
+//     sequence_number_last = imu_samples[ii].sequence_number;
+// 
+//     {
+//       std::lock_guard<std::mutex> lock( sync_mutex_ );
+//       mvVISLAM_AddAccel(vislam_ptr_, current_timestamp_ns,
+//           lin_acc[0], lin_acc[1], lin_acc[2]);
+//       mvVISLAM_AddGyro(vislam_ptr_, current_timestamp_ns,
+//           ang_vel[0], ang_vel[1], ang_vel[2]);
+//     }
+//   }  
+//   return rc;
+// }
 
 int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_frame_id, uint64_t& timestamp_ns ) {
   int32_t rc = 0;

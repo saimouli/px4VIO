@@ -31,11 +31,12 @@
  ****************************************************************************/
 #pragma once
 #include <atomic>
+#include <mutex>
+#include <ros/ros.h>
+#include "sensor_msgs/Imu.h"
 #include "SnapdragonCameraTypes.hpp"
 #include "mvVISLAM.h"
 #include "SnapdragonCameraManager.hpp"
-#include "SnapdragonImuManager.hpp"
-#include <mutex>
 
 namespace Snapdragon {
   class VislamManager;
@@ -44,12 +45,12 @@ namespace Snapdragon {
 /**
  * Class to wrap the mvVISLAM SDK with Camera and IMU Samples.
  */
-class Snapdragon::VislamManager : public Snapdragon::Imu_IEventListener {
+class Snapdragon::VislamManager{
 public:
 
   /**
    * This structure defines all the parameters needed to initialize
-   * the mvVISLAM_Initialize() method. Refer the API definition in 
+   * the mvVISLAM_Initialize() method. Refer the API definition in
    * mvVISLAM.h file to get the description for each field.
    **/
   typedef struct {
@@ -82,19 +83,19 @@ public:
    * Initalizes the VISLAM Manager with Camera and VISLAM Parameters
    * @param params
    *  The structure that holds the VISLAM parameters.
-   * @return 
+   * @return
    *  0 = success
    * otherwise = failure.
    **/
   int32_t Initialize
-  ( 
-    const Snapdragon::CameraParameters& cam_params, 
+  (
+    const Snapdragon::CameraParameters& cam_params,
     const Snapdragon::VislamManager::InitParams& params
   );
 
   /**
    * Start the Camera and Imu modules for the VISLAM functionality.
-   * @return 
+   * @return
    *   0 = success
    *  otherwise = failure;
    **/
@@ -102,7 +103,7 @@ public:
 
   /**
    * Stops the VISLAM engine by stoping the Camera and IMU modules.
-   * @return 
+   * @return
    *   0 = success;
    * otherwise = failure.
    **/
@@ -131,7 +132,7 @@ public:
    **/
   int32_t GetPose( mvVISLAMPose& pose, int64_t& frame_id, uint64_t& timestamp_ns );
 
-  /** 
+  /**
    * MV SDK's wrapper to get the PointCloud data.
    * @param points
    *  The Point Cloud points
@@ -160,7 +161,9 @@ public:
    *  0 = success;
    * otherwise = false;
    **/
-  int32_t Imu_IEventListener_ProcessSamples( sensor_imu* samples, uint32_t count );
+  // int32_t Imu_IEventListener_ProcessSamples( sensor_imu* samples, uint32_t count );
+
+  void callback_imu(const sensor_msgs::Imu::ConstPtr& msg);
 
   /**
    * Destructor
@@ -168,16 +171,18 @@ public:
   virtual ~VislamManager();
 
 private:
-  // utility methods 
+  // utility methods
   int32_t CleanUp();
   std::atomic<bool> initialized_;
   Snapdragon::CameraParameters          cam_params_;
   Snapdragon::VislamManager::InitParams vislam_params_;
   bool                          verbose_;
   Snapdragon::CameraManager*    cam_man_ptr_;
-  Snapdragon::ImuManager*       imu_man_ptr_;
+  // Snapdragon::ImuManager*       imu_man_ptr_;
   mvVISLAM*                     vislam_ptr_;
   std::mutex                    sync_mutex_;
   uint8_t*                      image_buffer_;
   size_t                        image_buffer_size_bytes_;
+
+  // ros::Subscriber imu_sub_;
 };
