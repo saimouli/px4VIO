@@ -32,17 +32,13 @@
 #include "SnapdragonVislamManager.hpp"
 #include "SnapdragonDebugPrint.h"
 
-Snapdragon::VislamManager::VislamManager(ros::NodeHandle nh) {
+Snapdragon::VislamManager::VislamManager(ros::NodeHandle nh) : nh_(nh) {
   cam_man_ptr_ = nullptr;
   // imu_man_ptr_ = nullptr;
   vislam_ptr_ = nullptr;
   initialized_ = false;
   image_buffer_size_bytes_ = 0;
   image_buffer_ = nullptr;
-  
-  // Setup publishers/subscribers
-  imu_sub_ = nh.subscribe("mavros/imu/data_raw", 10,
-                          &Snapdragon::VislamManager::ImuCallback, this);
 }
 
 Snapdragon::VislamManager::~VislamManager() {
@@ -52,8 +48,7 @@ Snapdragon::VislamManager::~VislamManager() {
 void Snapdragon::VislamManager::ImuCallback(
     const sensor_msgs::Imu::ConstPtr& msg)
 {
-  int64_t current_timestamp_ns =
-      msg->header.stamp.sec * 1e9 + msg->header.stamp.nsec;
+  int64_t current_timestamp_ns = msg->header.stamp.toNSec();
 
   static int64_t last_timestamp = 0;
   float delta = 0.f;
@@ -73,13 +68,18 @@ void Snapdragon::VislamManager::ImuCallback(
     }
   }
   last_timestamp = current_timestamp_ns;
+  
+  // Let's print every 10th time stamp
+  // if(msg->header.seq%10==0)
+  // {
+    ROS_INFO_STREAM("IMU time: " << last_timestamp);
+  // }
 
   // Parse IMU message
   float lin_acc[3], ang_vel[3];
-  const float kNormGZurich = 9.807f;
-  lin_acc[0] = msg->linear_acceleration.x * kNormGZurich;
-  lin_acc[1] = msg->linear_acceleration.y * kNormGZurich;
-  lin_acc[2] = msg->linear_acceleration.z * kNormGZurich;
+  lin_acc[0] = msg->linear_acceleration.x;
+  lin_acc[1] = msg->linear_acceleration.y;
+  lin_acc[2] = msg->linear_acceleration.z;
   ang_vel[0] = msg->angular_velocity.x;
   ang_vel[1] = msg->angular_velocity.y;
   ang_vel[2] = msg->angular_velocity.z;
@@ -112,14 +112,6 @@ void Snapdragon::VislamManager::ImuCallback(
 }
 
 int32_t Snapdragon::VislamManager::CleanUp() {
-  // stop the imu api first.
-  // if( imu_man_ptr_ != nullptr ) {
-  //   imu_man_ptr_->RemoveHandler( this );
-  //   imu_man_ptr_->Terminate();
-  //   delete imu_man_ptr_;
-  //   imu_man_ptr_ = nullptr;
-  // }
-
   //stop the camera.
   if( cam_man_ptr_ != nullptr ) {
     WARN_PRINT( "Stopping Camera...." );
@@ -160,17 +152,6 @@ int32_t Snapdragon::VislamManager::Initialize
       rc = -1;
     }
   }
-
-  // if( rc == 0 ) { //initialize the Imu Manager.
-  //   imu_man_ptr_ = new Snapdragon::ImuManager();
-  //   if( imu_man_ptr_ != nullptr ) {
-  //     rc = imu_man_ptr_->Initialize();
-  //     imu_man_ptr_->AddHandler( this );
-  //   }
-  //   else {
-  //     rc = -1;
-  //   }
-  // }
 
   //now intialize the VISLAM module.
   if( rc == 0 ) {
@@ -216,6 +197,10 @@ int32_t Snapdragon::VislamManager::Start() {
     image_buffer_size_bytes_ = cam_man_ptr_->GetImageSize();
     INFO_PRINT( "image Size: %d frameId: %lld", cam_man_ptr_->GetImageSize(), cam_man_ptr_->GetLatestFrameId() );
     image_buffer_ = new uint8_t[ image_buffer_size_bytes_ ];
+    
+    // Setup publishers/subscribers
+    imu_sub_ = nh_.subscribe("mavros/imu/data_raw", 10,
+                            &Snapdragon::VislamManager::ImuCallback, this);
   }
   else {
     ERROR_PRINT( "Calling Start without calling intialize" );
@@ -226,6 +211,9 @@ int32_t Snapdragon::VislamManager::Start() {
 
 int32_t Snapdragon::VislamManager::Stop() {
   CleanUp();
+  
+  // Unsubscribe from IMU topic
+  imu_sub_.shutdown();
   return 0;
 }
 
@@ -274,6 +262,7 @@ int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_fr
       pose = mvVISLAM_GetPose(vislam_ptr_);
       pose_frame_id = frame_id;
       timestamp_ns = static_cast<uint64_t>(modified_timestamp);
+      ROS_INFO_STREAM("Image time: " << timestamp_ns);
     }
   }
   return rc;

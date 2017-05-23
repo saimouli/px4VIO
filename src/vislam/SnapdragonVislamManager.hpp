@@ -150,26 +150,8 @@ public:
    * @return int32_t
    *  0 = success
    * otherwise = false;
+   int32_t Reset();
    **/
-  int32_t Reset();
-
-  /**
-   * The IMU callback handler to add the accel/gyro data into VISLAM.
-   * @param samples
-   *  The imu Samples to be added to VISLAM.
-   * @param count
-   *  The number of samples in the buffer.
-   * @return int32_t
-   *  0 = success;
-   * otherwise = false;
-   **/
-  // int32_t Imu_IEventListener_ProcessSamples( sensor_imu* samples, uint32_t count );
-<<<<<<< 3c130b7951dd44edaa7d33b99ccf85fc73d1133a
-
-  void callback_imu(const sensor_msgs::Imu::ConstPtr& msg);
-=======
-
->>>>>>> Now using imu ros messages for Vislam - compiling, but untested
 
   /**
    * Destructor
@@ -177,12 +159,9 @@ public:
   virtual ~VislamManager();
 
 private:
-<<<<<<< 3c130b7951dd44edaa7d33b99ccf85fc73d1133a
-  // utility methods
-=======
-  // utility methods
   void ImuCallback(const sensor_msgs::Imu::ConstPtr& msg);
->>>>>>> Now using imu ros messages for Vislam - compiling, but untested
+
+  // utility methods
   int32_t CleanUp();
   std::atomic<bool> initialized_;
   Snapdragon::CameraParameters          cam_params_;
@@ -194,11 +173,7 @@ private:
   std::mutex                    sync_mutex_;
   uint8_t*                      image_buffer_;
   size_t                        image_buffer_size_bytes_;
-<<<<<<< 3c130b7951dd44edaa7d33b99ccf85fc73d1133a
 
-  // ros::Subscriber imu_sub_;
-=======
-
+  ros::NodeHandle nh_;
   ros::Subscriber imu_sub_;
->>>>>>> Now using imu ros messages for Vislam - compiling, but untested
 };
