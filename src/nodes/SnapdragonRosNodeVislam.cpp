@@ -189,6 +189,19 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
           // Publish Pose Data
           PublishVislamData( vislamPose, vislamFrameId, timestamp_ns );
       }
+      else
+      {
+        switch (vislamPose.poseQuality)
+        {
+          case MV_TRACKING_STATE_FAILED:
+            ROS_INFO_THROTTLE(1, "VISLAM TRACKING FAILED");
+            break;
+
+          case MV_TRACKING_STATE_INITIALIZING:
+            ROS_INFO_THROTTLE(1, "VISLAM INITIALIZING");
+            break;
+        }
+      }
     }
     else {
       ROS_WARN_STREAM( "Snapdragon::RosNodeVislam::VislamThreadMain: Warning Getting Pose Information" );

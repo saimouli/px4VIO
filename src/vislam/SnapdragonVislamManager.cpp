@@ -48,6 +48,9 @@ Snapdragon::VislamManager::~VislamManager() {
 void Snapdragon::VislamManager::ImuCallback(
     const sensor_msgs::Imu::ConstPtr& msg)
 {
+  // Convert from ENU (mavros) to NED (vislam expectation) frame
+  sensor_msgs::Imu msg_ned = *msg;
+  
   int64_t current_timestamp_ns = msg->header.stamp.toNSec();
 
   static int64_t last_timestamp = 0;
@@ -69,16 +72,18 @@ void Snapdragon::VislamManager::ImuCallback(
   }
   last_timestamp = current_timestamp_ns;
 
-  ROS_INFO_STREAM("IMU time: \t" << last_timestamp);
+  // ROS_INFO_STREAM("IMU time: \t" << last_timestamp);
 
   // Parse IMU message
   float lin_acc[3], ang_vel[3];
-  lin_acc[0] = msg->linear_acceleration.x;
-  lin_acc[1] = msg->linear_acceleration.y;
-  lin_acc[2] = msg->linear_acceleration.z;
-  ang_vel[0] = msg->angular_velocity.x;
-  ang_vel[1] = msg->angular_velocity.y;
-  ang_vel[2] = msg->angular_velocity.z;
+  
+  // Convert ENU to NED coordinates
+  lin_acc[0] = msg->linear_acceleration.y;
+  lin_acc[1] = msg->linear_acceleration.x;
+  lin_acc[2] = -msg->linear_acceleration.z;
+  ang_vel[0] = msg->angular_velocity.y;
+  ang_vel[1] = msg->angular_velocity.x;
+  ang_vel[2] = -msg->angular_velocity.z;
 
   // Check for dropped IMU messages
   static uint32_t sequence_number_last = 0;
@@ -258,7 +263,7 @@ int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_fr
       pose = mvVISLAM_GetPose(vislam_ptr_);
       pose_frame_id = frame_id;
       timestamp_ns = static_cast<uint64_t>(modified_timestamp);
-      ROS_INFO_STREAM("Image time: \t" << timestamp_ns);
+      // ROS_INFO_STREAM("Image time: \t" << timestamp_ns);
     }
   }
   return rc;

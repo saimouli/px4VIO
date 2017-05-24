@@ -152,6 +152,7 @@ public:
    * otherwise = false;
    int32_t Reset();
    **/
+  int32_t Reset();
 
   /**
    * Destructor
@@ -163,6 +164,7 @@ private:
 
   // utility methods
   int32_t CleanUp();
+
   std::atomic<bool> initialized_;
   Snapdragon::CameraParameters          cam_params_;
   Snapdragon::VislamManager::InitParams vislam_params_;
