@@ -1,7 +1,7 @@
 <launch>
   <!-- MAVROS -->
   <!-- See the correct UDP port from px4's mainapp.config (HIGHRES_IMU stream) -->
-	<arg name="fcu_url" default="udp://127.0.0.1:46300@127.0.0.1:14556" />
+	<arg name="fcu_url" default="udp://127.0.0.1:46300@127.0.0.1:14559" />
 	<arg name="gcs_url" default="" />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
