@@ -170,7 +170,6 @@ private:
   Snapdragon::VislamManager::InitParams vislam_params_;
   bool                          verbose_;
   Snapdragon::CameraManager*    cam_man_ptr_;
-  // Snapdragon::ImuManager*       imu_man_ptr_;
   mvVISLAM*                     vislam_ptr_;
   std::mutex                    sync_mutex_;
   uint8_t*                      image_buffer_;

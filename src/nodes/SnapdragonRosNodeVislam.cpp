@@ -189,7 +189,9 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
           // Publish Pose Data
           PublishVislamData( vislamPose, vislamFrameId, timestamp_ns );
       }
-      else
+
+      // Log changes in tracking state
+      if (previous_mv_tracking_state_ != vislamPose.poseQuality)
       {
         switch (vislamPose.poseQuality)
         {
@@ -200,8 +202,17 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
           case MV_TRACKING_STATE_INITIALIZING:
             ROS_INFO_THROTTLE(1, "VISLAM INITIALIZING");
             break;
+
+          case MV_TRACKING_STATE_HIGH_QUALITY:
+            ROS_INFO_THROTTLE(1, "VISLAM TRACKING HIGH QUALITY");
+            break;
+
+          case MV_TRACKING_STATE_LOW_QUALITY:
+            ROS_INFO_THROTTLE(1, "VISLAM TRACKING LOW QUALITY");
+            break;
         }
       }
+      previous_mv_tracking_state_ = vislamPose.poseQuality;
     }
     else {
       ROS_WARN_STREAM( "Snapdragon::RosNodeVislam::VislamThreadMain: Warning Getting Pose Information" );

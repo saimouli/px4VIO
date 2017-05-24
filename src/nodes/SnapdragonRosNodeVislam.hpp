@@ -103,4 +103,5 @@ private:
   ros::NodeHandle  nh_;
   ros::Publisher   pub_vislam_pose_;
   ros::Publisher   pub_vislam_odometry_;
+  int previous_mv_tracking_state_ = MV_TRACKING_STATE_FAILED;
 };
