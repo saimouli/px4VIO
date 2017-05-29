@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>rpg_qualcomm_vislam</name>
+  <name>snapdragon_mavros_vislam</name>
   <version>0.1.1</version>
   <description>
     Private fork of the Qualcomm Vislam example code from ATLFlight 
