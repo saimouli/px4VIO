@@ -34,7 +34,6 @@
 
 Snapdragon::VislamManager::VislamManager(ros::NodeHandle nh) : nh_(nh) {
   cam_man_ptr_ = nullptr;
-  // imu_man_ptr_ = nullptr;
   vislam_ptr_ = nullptr;
   initialized_ = false;
   image_buffer_size_bytes_ = 0;
@@ -78,11 +77,11 @@ void Snapdragon::VislamManager::ImuCallback(
   float lin_acc[3], ang_vel[3];
   
   // Convert ENU to NED coordinates
-  lin_acc[0] = msg->linear_acceleration.y;
-  lin_acc[1] = msg->linear_acceleration.x;
+  lin_acc[0] = msg->linear_acceleration.x;
+  lin_acc[1] = -msg->linear_acceleration.y;
   lin_acc[2] = -msg->linear_acceleration.z;
-  ang_vel[0] = msg->angular_velocity.y;
-  ang_vel[1] = msg->angular_velocity.x;
+  ang_vel[0] = msg->angular_velocity.x;
+  ang_vel[1] = -msg->angular_velocity.y;
   ang_vel[2] = -msg->angular_velocity.z;
 
   // Check for dropped IMU messages
