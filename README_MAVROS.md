@@ -6,6 +6,19 @@ Get the mavros sources into your catkin's source directory by following the inst
 
 Note: Step 3 should also include `--rosdistro kinetic` flag.
 
+Note2: On a freshly flashed snapdragon, I had to install the following things
+* python pip
+* python future (`pip install future`)
+* `sudo apt-get install ros-indigo-diagnostic-updater`
+* `sudo apt-get install ros-indigo-angles`
+* `sudo apt-get install ros-indigo-eigen-conversions`
+* `sudo apt-get install ros-indigo-urdf`
+* `sudo apt-get install ros-indigo-tf`
+* `sudo apt-get install ros-indigo-control-toolbox`
+  If `control-toolbox` cannot be installed due to unmet dependencies, you might have to install the missing dependency yourself. In my case overwriting an existing file was necessary for the package `fontconfig-config`. That can be done with
+  `sudo apt-get -o Dpkg::Options::="--force-overwrite" install fontconfig-config`
+
+
 ## Build
 `catkin build`
 
