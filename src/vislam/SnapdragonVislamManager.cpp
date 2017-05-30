@@ -71,7 +71,7 @@ void Snapdragon::VislamManager::ImuCallback(
   }
   last_timestamp = current_timestamp_ns;
 
-  // ROS_INFO_STREAM("IMU time: \t" << last_timestamp);
+  ROS_INFO_STREAM_THROTTLE(1, "IMU time: \t" << last_timestamp);
 
   // Parse IMU message
   float lin_acc[3], ang_vel[3];
@@ -262,7 +262,7 @@ int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_fr
       pose = mvVISLAM_GetPose(vislam_ptr_);
       pose_frame_id = frame_id;
       timestamp_ns = static_cast<uint64_t>(modified_timestamp);
-      // ROS_INFO_STREAM("Image time: \t" << timestamp_ns);
+      ROS_INFO_STREAM_THROTTLE(1, "Image time: \t" << timestamp_ns);
     }
   }
   return rc;
