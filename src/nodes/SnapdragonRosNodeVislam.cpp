@@ -116,7 +116,11 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
 
   Snapdragon::VislamManager::InitParams vislamParams;
 
-  // Transformation between camera and ROS IMU frame (board frame apparently)
+  // Transformation between camera and ROS IMU frame. It seems that mavros 
+  // does not only invert the IMU Y- and Z-Axis, but also transforms the sensor
+  // readings to the board coordinate frame. I did not confirm that in the mavros
+  // sources, but the online translation and rotation estimates converge nicely
+  // nicely to values supporting this hypothesis.
   vislamParams.tbc[0] = 0.009;  // default: 0.005
   vislamParams.tbc[1] = 0.000;  // default 0.015
   vislamParams.tbc[2] = 0.0;    // default 0.0
