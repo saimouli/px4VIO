@@ -110,13 +110,14 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
 
   Snapdragon::VislamManager::InitParams vislamParams;
 
-  vislamParams.tbc[0] = 0.005;
-  vislamParams.tbc[1] = 0.0150;
-  vislamParams.tbc[2] = 0.0;
+  // Transformation between camera and ROS IMU frame (board frame apparently)
+  vislamParams.tbc[0] = 0.009;  // default: 0.005
+  vislamParams.tbc[1] = 0.000;  // default 0.015
+  vislamParams.tbc[2] = 0.0;    // default 0.0
 
-  vislamParams.ombc[0] = 0.0;
-  vislamParams.ombc[1] = 0.0;
-  vislamParams.ombc[2] = 1.57;
+  vislamParams.ombc[0] = 2.221;   //  pi / sqrt(2)
+  vislamParams.ombc[1] = -2.221;  // -pi / sqrt(2)
+  vislamParams.ombc[2] = 0.0;
 
   vislamParams.delta = -0.008;
 
