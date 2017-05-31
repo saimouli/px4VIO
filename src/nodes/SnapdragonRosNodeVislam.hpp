@@ -89,19 +89,24 @@ public:
    * Destructor for the node.
    */
   ~Vislam();
-private: 
 
+private:
   // class methods
-  int32_t PublishVislamData( mvVISLAMPose& vislamPose, int64_t vislamFrameId, uint64_t timestamp_ns );
+  int32_t PublishVislamData(mvVISLAMPose& vislamPose, int64_t vislamFrameId,
+                            uint64_t timestamp_ns);
   void ThreadMain();
 
   // data members;
-  std::thread       vislam_process_thread_;
+  std::thread vislam_process_thread_;
   std::atomic<bool> thread_started_;
   std::atomic<bool> thread_stop_;
   std::atomic<bool> vislam_initialized_;
-  ros::NodeHandle  nh_;
-  ros::Publisher   pub_vislam_pose_;
-  ros::Publisher   pub_vislam_odometry_;
+  ros::NodeHandle nh_;
+  ros::Publisher pub_vislam_pose_;
+  ros::Publisher pub_vislam_odometry_;
+  ros::Publisher pub_vislam_tbc_estimate_;
+  ros::Publisher pub_vislam_rbc_estimate_x_;
+  ros::Publisher pub_vislam_rbc_estimate_y_;
+  ros::Publisher pub_vislam_rbc_estimate_z_;
   int previous_mv_tracking_state_ = MV_TRACKING_STATE_FAILED;
 };
