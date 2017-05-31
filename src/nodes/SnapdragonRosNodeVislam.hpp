@@ -103,6 +103,7 @@ private:
   std::atomic<bool> vislam_initialized_;
   ros::NodeHandle nh_;
   ros::Publisher pub_vislam_pose_;
+  ros::Publisher pub_vislam_pose_cov_;
   ros::Publisher pub_vislam_odometry_;
   ros::Publisher pub_vislam_tbc_estimate_;
   ros::Publisher pub_vislam_rbc_estimate_x_;
