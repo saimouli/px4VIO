@@ -20,7 +20,8 @@
   
   <node pkg="snapdragon_mavros_vislam" type="snap_vislam_node" name="snap_vislam_node" output="screen">
       <!-- <rosparam file="$(find rpg_qualcomm_vislam)/parameters/default.yaml"/> -->
-  </node>
+  	<remap from="vislam/pose_cov" to="mavros/vision_pose/pose_cov"/>
+	</node>
 	
 	<node pkg="snapdragon_mavros_vislam" type="external_pose_translator.py" name="external_pose_translator" output="screen">
   </node>
