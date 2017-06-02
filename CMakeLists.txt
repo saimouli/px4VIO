@@ -128,7 +128,6 @@ add_library(snap_vislam
    src/camera/SnapdragonCameraManager.cpp
    src/common/SnapdragonDebugPrint.cpp
    src/camera/SnapdragonCameraUtil.cpp
-   src/imu/SnapdragonImuManager.cpp
    src/vislam/SnapdragonVislamManager.cpp
 )
 
