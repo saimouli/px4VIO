@@ -3,8 +3,7 @@
   <name>snapdragon_mavros_vislam</name>
   <version>0.1.1</version>
   <description>
-    Private fork of the Qualcomm Vislam example code from ATLFlight 
-    (https://github.com/ATLFlight/ros-examples) for use with the Snapdragon Flight
+    Fork of the Qualcomm Vislam example code from ATLFlight (https://github.com/ATLFlight/ros-examples) modified for use with the px4 flight stack.
   </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 

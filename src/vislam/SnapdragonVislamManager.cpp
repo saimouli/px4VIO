@@ -186,7 +186,6 @@ int32_t Snapdragon::VislamManager::Start() {
   int32_t rc = 0;
   if( initialized_ ) {
     //start the camera
-    // rc =  imu_man_ptr_->Start();
     rc |= cam_man_ptr_->Start();
 
     //wait till we get the first frame.

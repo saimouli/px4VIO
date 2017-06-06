@@ -23,14 +23,12 @@ On a freshly flashed snapdragon, I had to install the following packages
 * `sudo apt-get install ros-indigo-control-toolbox`
   If `control-toolbox` cannot be installed due to unmet dependencies, you might have to install the missing dependency yourself. In my case overwriting an existing file was necessary for the package `fontconfig-config`. That can be done with
   `sudo apt-get -o Dpkg::Options::="--force-overwrite" install fontconfig-config`
->>>>>>> Readme update
 
 ## Build
 `catkin build`
 
 Compiling mavros can easily take 30 minutes on the snapdragon.
 
-<<<<<<< 2121ee3681d9575c9a3f9d06fea03a7e8cca1ec7
 ## High-Level Block Diagram
 ![SnapVislamRosNodeBlockDiagram](images/SnapVislamRosNodeBlockDiagram.jpg)
 
@@ -140,8 +138,6 @@ git clone -b mv-release-1.0.2 https://github.com/ATLFlight/ros-examples.git snap
 ```
 
 * Build the code
-=======
->>>>>>> Readme update
 
 ## Configure
 Copy the px4 configuration files from `./px4_configs` to their respective location on the snapdragon. For using the recommended LPE:
