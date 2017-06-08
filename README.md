@@ -3,7 +3,7 @@ This repository is a fork of the VISLAM from ATLFlight/ros-examples, modified to
 
 ## Preparations
 ### Mavros
-Get the mavros sources into your catkin's source directory by following the instructions from the [mavros git page](https://github.com/mavlink/mavros/tree/master/mavros#source-installation).
+Get the mavros sources into your catkin's source directory by following the instructions from the [mavros git page](https://github.com/mavlink/mavros/tree/master/mavros#source-installation). Last tested version of mavros is version [0.19](https://github.com/mavlink/mavros/releases/tag/0.19.0) and the respective commit [399a04ef57](https://github.com/mavlink/mavros/tree/399a04ef5739bd93fe1c596b63d6bdbfba7d84ef).
 
 This example code is for MV SDK release [mv_1.0.2](https://developer.qualcomm.com/hardware/snapdragon-flight/tools).
 
