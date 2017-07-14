@@ -30,8 +30,9 @@
  *
  ****************************************************************************/
 #pragma once
-#include <atomic>
 #include <mutex>
+#include <atomic>         // std::atomic
+#include <time.h>         // clock_gettime
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/Vector3.h>

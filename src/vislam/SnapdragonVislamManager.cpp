@@ -254,14 +254,28 @@ int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_fr
     // adjust the frame-timestamp for VISLAM at it needs the time at the center of the exposure and not the sof.
     // Correction from exposure time
     float correction = 1e3 * (cam_man_ptr_->GetExposureTimeUs()/2.f);
-    float modified_timestamp = frame_ts_ns - static_cast<int64_t>(correction);
+    
+    // Adjust timestamp with clock offset MONOTONIC <-> REALTIME:
+    // Camera images will correctly have REALTIME timestamps, IMU messages 
+    // however carry the MONOTONIC timestamp.
+    timespec mono_time, wall_time;
+    if (clock_gettime(CLOCK_MONOTONIC, &mono_time) ||
+        clock_gettime(CLOCK_REALTIME, &wall_time))
+    {
+      ERROR_PRINT("Cannot access clock time");
+      return -1;
+    }
+    // TODO: Perhaps filter clock_offset_ns. So far I only observed jumps of 1 milisecond though.
+    int64_t clock_offset_ns = (wall_time.tv_sec - mono_time.tv_sec) * 1e9 +
+                               wall_time.tv_nsec - mono_time.tv_nsec;
+    uint64_t modified_timestamp = frame_ts_ns - static_cast<uint64_t>(correction) + clock_offset_ns;
     {
       std::lock_guard<std::mutex> lock( sync_mutex_ );
       mvVISLAM_AddImage(vislam_ptr_, modified_timestamp, image_buffer_ );
       pose = mvVISLAM_GetPose(vislam_ptr_);
       pose_frame_id = frame_id;
       timestamp_ns = static_cast<uint64_t>(modified_timestamp);
-      ROS_INFO_STREAM_THROTTLE(1, "Image timestamp [ns]: \t" << timestamp_ns);
+      ROS_INFO_STREAM_THROTTLE(1, "Image timestamp [ns]: \t" << modified_timestamp);
     }
   }
   return rc;
