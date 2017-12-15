@@ -63,7 +63,7 @@ Snapdragon::RosNode::Vislam::~Vislam()
 }
 
 int32_t Snapdragon::RosNode::Vislam::Initialize()
-{ 
+{
   vislam_initialized_ = true;
   return 0;
 }
@@ -116,17 +116,15 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
 
   Snapdragon::VislamManager::InitParams vislamParams;
 
-  // Transformation between camera and ROS IMU frame. It seems that mavros 
-  // does not only invert the IMU Y- and Z-Axis, but also transforms the sensor
-  // readings to the board coordinate frame. I did not confirm that in the mavros
-  // sources, but the online translation and rotation estimates converge nicely
-  // nicely to values supporting this hypothesis.
-  vislamParams.tbc[0] = 0.009;  // default: 0.005
-  vislamParams.tbc[1] = 0.000;  // default 0.015
-  vislamParams.tbc[2] = 0.0;    // default 0.0
+  // use the translation that the algorithm converges to
+  vislamParams.tbc[0] = -0.006;
+  vislamParams.tbc[1] = -0.020;
+  vislamParams.tbc[2] = 0.0;
 
-  vislamParams.ombc[0] = 2.221;   //  pi / sqrt(2)
-  vislamParams.ombc[1] = -2.221;  // -pi / sqrt(2)
+  // Transformation between camera and ROS IMU frame (forward-left-up).
+  // Unit vector (1/sqrt(2), -1/sqrt(2), 0) times rotation magnitude PI
+  vislamParams.ombc[0] = 2.221;   //  PI / sqrt(2)
+  vislamParams.ombc[1] = -2.221;  // -PI / sqrt(2)
   vislamParams.ombc[2] = 0.0;
 
   vislamParams.delta = -0.008;
@@ -154,7 +152,7 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
   vislamParams.useLogCameraHeight = false;
   vislamParams.logCameraHeightBootstrap = -3.22;
   vislamParams.noInitWhenMoving = true;
-  vislamParams.limitedIMUbWtrigger = 35.0;  
+  vislamParams.limitedIMUbWtrigger = 35.0;
 
   Snapdragon::CameraParameters param;
   param.enable_cpa = 1;
@@ -171,7 +169,7 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
   cpaConfig.legacyCost.exposureCost = 1.0f;
   cpaConfig.legacyCost.gainCost = 0.3333f;
 
-  param.mv_cpa_config = cpaConfig;   
+  param.mv_cpa_config = cpaConfig;
   Snapdragon::VislamManager vislam_man(nh_);
   if( vislam_man.Initialize( param, vislamParams ) != 0  ) {
     ROS_WARN_STREAM( "Snapdragon::RosNodeVislam::VislamThreadMain: Error initializing the VISLAM Manager " );
@@ -195,7 +193,7 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
     vislam_ret = vislam_man.GetPose( vislamPose, vislamFrameId, timestamp_ns );
     if( vislam_ret == 0 ) {
       //check if the pose quality is good.  If not do not publish the data.
-      if( vislamPose.poseQuality != MV_TRACKING_STATE_FAILED  && 
+      if( vislamPose.poseQuality != MV_TRACKING_STATE_FAILED  &&
           vislamPose.poseQuality != MV_TRACKING_STATE_INITIALIZING ) {
           // Publish Pose Data
           PublishVislamData( vislamPose, vislamFrameId, timestamp_ns );
@@ -255,7 +253,7 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
     vislamPose.bodyPose.matrix[1][2],
     vislamPose.bodyPose.matrix[2][0],
     vislamPose.bodyPose.matrix[2][1],
-    vislamPose.bodyPose.matrix[2][2]); 
+    vislamPose.bodyPose.matrix[2][2]);
   tf2::Quaternion q;
   R.getRotation(q);
   pose_msg.pose.position.x = vislamPose.bodyPose.matrix[0][3];
@@ -266,32 +264,32 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
   pose_msg.pose.orientation.z = q.getZ();
   pose_msg.pose.orientation.w = q.getW();
   pub_vislam_pose_.publish(pose_msg);
-  
+
   // Publish translation and rotation estimates
   geometry_msgs::Vector3 tbc_msg;
   tbc_msg.x = vislamPose.tbc[0];
   tbc_msg.y = vislamPose.tbc[1];
   tbc_msg.z = vislamPose.tbc[2];
   pub_vislam_tbc_estimate_.publish(tbc_msg);
-  
+
   geometry_msgs::Vector3 rbc_x_msg;
   rbc_x_msg.x = vislamPose.Rbc[0][0];
   rbc_x_msg.y = vislamPose.Rbc[0][1];
   rbc_x_msg.z = vislamPose.Rbc[0][2];
   pub_vislam_rbc_estimate_x_.publish(rbc_x_msg);
-  
+
   geometry_msgs::Vector3 rbc_y_msg;
   rbc_y_msg.x = vislamPose.Rbc[1][0];
   rbc_y_msg.y = vislamPose.Rbc[1][1];
   rbc_y_msg.z = vislamPose.Rbc[1][2];
   pub_vislam_rbc_estimate_y_.publish(rbc_y_msg);
-  
+
   geometry_msgs::Vector3 rbc_z_msg;
   rbc_z_msg.x = vislamPose.Rbc[2][0];
   rbc_z_msg.y = vislamPose.Rbc[2][1];
   rbc_z_msg.z = vislamPose.Rbc[2][2];
   pub_vislam_rbc_estimate_z_.publish(rbc_z_msg);
-  
+
 
   //publish the odometry message.
   nav_msgs::Odometry odom_msg;
@@ -312,7 +310,7 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
     }
   }
   pub_vislam_odometry_.publish(odom_msg);
-  
+
   // Publish pose with covariance (for mavros)
   geometry_msgs::PoseWithCovarianceStamped pose_cov_msg;
   pose_cov_msg.header = odom_msg.header;
@@ -338,5 +336,5 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
 
   // broadcast transforms
   static tf2_ros::TransformBroadcaster br;
-  br.sendTransform(transforms);     
+  br.sendTransform(transforms);
 }
