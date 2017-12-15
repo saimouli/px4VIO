@@ -49,7 +49,7 @@ void Snapdragon::VislamManager::ImuCallback(
 {
   // Convert from ENU (mavros) to NED (vislam expectation) frame
   sensor_msgs::Imu msg_ned = *msg;
-  
+
   int64_t current_timestamp_ns = msg->header.stamp.toNSec();
 
   static int64_t last_timestamp = 0;
@@ -125,18 +125,18 @@ int32_t Snapdragon::VislamManager::CleanUp() {
   if( vislam_ptr_ != nullptr ) {
     mvVISLAM_Deinitialize( vislam_ptr_ );
     vislam_ptr_ = nullptr;
-  } 
+  }
 
   if( image_buffer_ != nullptr ) {
     delete[] image_buffer_;
     image_buffer_ = nullptr;
     image_buffer_size_bytes_ = 0;
   }
-  return 0;  
+  return 0;
 }
 
 int32_t Snapdragon::VislamManager::Initialize
-( 
+(
   const Snapdragon::CameraParameters& cam_params,
   const Snapdragon::VislamManager::InitParams& vislam_params
 ) {
@@ -196,7 +196,7 @@ int32_t Snapdragon::VislamManager::Start() {
     image_buffer_size_bytes_ = cam_man_ptr_->GetImageSize();
     INFO_PRINT( "image Size: %d frameId: %lld", cam_man_ptr_->GetImageSize(), cam_man_ptr_->GetLatestFrameId() );
     image_buffer_ = new uint8_t[ image_buffer_size_bytes_ ];
-    
+
     // Setup publishers/subscribers
     imu_sub_ = nh_.subscribe("mavros/imu/data_raw", 10,
                             &Snapdragon::VislamManager::ImuCallback, this);
@@ -210,7 +210,7 @@ int32_t Snapdragon::VislamManager::Start() {
 
 int32_t Snapdragon::VislamManager::Stop() {
   CleanUp();
-  
+
   // Unsubscribe from IMU topic
   imu_sub_.shutdown();
   return 0;
@@ -235,7 +235,7 @@ int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_fr
   }
 
   // first set the Image from the camera.
-  // Next add it to the mvVISLAM 
+  // Next add it to the mvVISLAM
   // Then call the API to get the Pose.
   int64_t frame_id;
   uint32_t used = 0;
@@ -254,9 +254,9 @@ int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_fr
     // adjust the frame-timestamp for VISLAM at it needs the time at the center of the exposure and not the sof.
     // Correction from exposure time
     float correction = 1e3 * (cam_man_ptr_->GetExposureTimeUs()/2.f);
-    
+
     // Adjust timestamp with clock offset MONOTONIC <-> REALTIME:
-    // Camera images will correctly have REALTIME timestamps, IMU messages 
+    // Camera images will correctly have REALTIME timestamps, IMU messages
     // however carry the MONOTONIC timestamp.
     timespec mono_time, wall_time;
     if (clock_gettime(CLOCK_MONOTONIC, &mono_time) ||
