@@ -308,6 +308,28 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
       odom_msg.pose.covariance[ i*6 + j ] = vislamPose.errCovPose[i][j];
     }
   }
+
+  //rotate to ENU mavros standard TODO find nicer solution
+  odom_msg.pose.pose.position.x = -pose_msg.pose.position.y;
+  odom_msg.pose.pose.position.y =  pose_msg.pose.position.x;
+  odom_msg.twist.twist.linear.x =  -vislamPose.velocity[1];
+  odom_msg.twist.twist.linear.y =   vislamPose.velocity[0];
+  odom_msg.twist.twist.angular.x = -vislamPose.angularVelocity[1];
+  odom_msg.twist.twist.angular.y =  vislamPose.angularVelocity[0];
+  //switch the first two rows of the covariance matrix
+  for (int16_t i = 0; i < 6; i++)
+  {
+     float64_t temp = odom_msg.pose.covariance[i]; //save value of upper row
+     odom_msg.pose.covariance[i] = odom_msg.pose.covariance[6 + i];
+     odom_msg.pose.covariance[6 + i] = temp;
+  }
+  float64_t temp = odom_msg.pose.covariance[0];
+  odom_msg.pose.covariance[0] = odom_msg.pose.covariance[1];
+  odom_msg.pose.covariance[1] = temp;
+  temp = odom_msg.pose.covariance[7];
+  odom_msg.pose.covariance[7] = odom_msg.pose.covariance[8];
+  odom_msg.pose.covariance[8] = temp;
+
   pub_vislam_odometry_.publish(odom_msg);
 
   // compute transforms
