@@ -44,7 +44,6 @@
 Snapdragon::RosNode::Vislam::Vislam( ros::NodeHandle nh ) : nh_(nh)
 {
   pub_vislam_pose_ = nh_.advertise<geometry_msgs::PoseStamped>("vislam/pose",1);
-  pub_vislam_pose_cov_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("vislam/pose_cov",1);
   pub_vislam_odometry_ = nh_.advertise<nav_msgs::Odometry>("vislam/odometry",1);
   pub_vislam_tbc_estimate_ = nh_.advertise<geometry_msgs::Vector3>("vislam/tbc",1);
   pub_vislam_rbc_estimate_x_ = nh_.advertise<geometry_msgs::Vector3>("vislam/rbc_x", 1);
@@ -310,12 +309,6 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
     }
   }
   pub_vislam_odometry_.publish(odom_msg);
-
-  // Publish pose with covariance (for mavros)
-  geometry_msgs::PoseWithCovarianceStamped pose_cov_msg;
-  pose_cov_msg.header = odom_msg.header;
-  pose_cov_msg.pose = odom_msg.pose;
-  pub_vislam_pose_cov_.publish(pose_cov_msg);
 
   // compute transforms
   std::vector<geometry_msgs::TransformStamped> transforms;
