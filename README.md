@@ -15,19 +15,14 @@ This example code is for MV SDK release [mv_1.0.2](https://developer.qualcomm.co
 On a freshly flashed snapdragon, I had to install the following packages
 * python pip
 * python future (`pip install future`)
-* `sudo apt-get install ros-indigo-diagnostic-updater`
-* `sudo apt-get install ros-indigo-angles`
-* `sudo apt-get install ros-indigo-eigen-conversions`
-* `sudo apt-get install ros-indigo-urdf`
-* `sudo apt-get install ros-indigo-tf`
-* `sudo apt-get install ros-indigo-control-toolbox`
+* `sudo apt-get install ros-indigo-diagnostic-updater ros-indigo-angles ros-indigo-eigen-conversions ros-indigo-urdf ros-indigo-tf ros-indigo-control-toolbox`
   If `control-toolbox` cannot be installed due to unmet dependencies, you might have to install the missing dependency yourself. In my case overwriting an existing file was necessary for the package `fontconfig-config`. That can be done with
   `sudo apt-get -o Dpkg::Options::="--force-overwrite" install fontconfig-config`
 
 ## Build
 `catkin build`
 
-Compiling mavros can easily take 30 minutes on the snapdragon.
+Compiling mavros can easily take 30 minutes on the snapdragon. You might have to create a swap file when building catkin. Check [this website](https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-16-04) on how to do that.
 
 ## High-Level Block Diagram
 ![SnapVislamRosNodeBlockDiagram](images/SnapVislamRosNodeBlockDiagram.jpg)
@@ -127,43 +122,21 @@ echo "source /home/linaro/ros_ws/devel/setup.bash" >> /home/linaro/.bashrc
 This ensures that the ROS workspace is setup correctly.
 
 #### Clone the sample code
-* The repo may be cloned from [here]( from https://github.com/ATLFlight/ros-examples.git) directly on the target, or cloned on the host computer and then pushed to the target using ADB. The recommended method is to clone directly on the target.
-
-```
-adb shell
-source /home/linaro/.bashrc
-roscd
-cd ../src
-git clone -b mv-release-1.0.2 https://github.com/ATLFlight/ros-examples.git snap_ros_examples
-```
+* The repo may be cloned directly on the target (catkin workspace), or cloned on the host computer and then pushed to the target using ADB. The recommended method is to clone directly on the target.
 
 * Build the code
 
 ## Configure
-Copy the px4 configuration files from `./px4_configs` to their respective location on the snapdragon. For using the recommended LPE:
+Copy the px4 configuration files from `./px4_configs` to their respective location on the snapdragon. For using the recommended EKF2:
 ```
 cd snapdragon_mavros_vislam
-adb push ./px4_confs/lpe/mainapp.conf /home/linaro/mainapp.conf
-adb push ./px4_confs/lpe/px4.config /usr/share/data/adsp/px4.config
-```
-
-and if you want to give EKF2 a try:
-```
-cd snapdragon_mavros_vislam
-adb push ./px4_confs/ekf2/mainapp.conf /home/linaro/mainapp.conf
-adb push ./px4_confs/ekf2/px4.config /usr/share/data/adsp/px4.config
+adb push ./px4_confs/ekf2/mainapp.conf /home/linaro/mainapp_vislam.conf
 ```
 
 The configurations are intended to provide a working starting point. Adjust parameters to your likings.
 
 ## Run
-Get a roscore up and running
-```
-adb shell
-roscore
-```
-
-In another terminal, launch mavros and vislam
+In a terminal, launch mavros and vislam
 ```
 adb shell
 roslaunch snapdragon_mavros_vislam mavros_vislam.launch
@@ -173,5 +146,5 @@ Start the px4 flight stack
 ```
 adb shell
 cd $HOME
-./px4 mainapp.config
+./px4 mainapp_vislam.config
 ```
