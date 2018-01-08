@@ -39,7 +39,6 @@
 #include <nav_msgs/Odometry.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/buffer.h>
 
 Snapdragon::RosNode::Vislam::Vislam( ros::NodeHandle nh ) : nh_(nh)
@@ -53,30 +52,6 @@ Snapdragon::RosNode::Vislam::Vislam( ros::NodeHandle nh ) : nh_(nh)
   vislam_initialized_ = false;
   thread_started_ = false;
   thread_stop_ = false;
-
-  // send static transform from "vislam" (front-left-up) to NED that Mavros needs
-  tf2_ros::StaticTransformBroadcaster tf2_static_broadcaster;
-  geometry_msgs::TransformStamped static_transformStamped_1;
-  geometry_msgs::TransformStamped static_transformStamped_2;
-
-  static_transformStamped_1.header.stamp = ros::Time::now();
-	static_transformStamped_1.header.frame_id = "vislam";
-	static_transformStamped_1.child_frame_id = "local_origin_ned";
-  static_transformStamped_2.header.stamp = ros::Time::now();
-	static_transformStamped_2.header.frame_id = "vislam";
-	static_transformStamped_2.child_frame_id = "fcu_frd";
-
-  tf2::Quaternion quat;
-  quat.setRPY(M_PI, 0, 0);
-  static_transformStamped_1.transform.rotation.x = quat.x();
-  static_transformStamped_1.transform.rotation.y = quat.y();
-  static_transformStamped_1.transform.rotation.z = quat.z();
-  static_transformStamped_1.transform.rotation.w = quat.w();
-  static_transformStamped_2.transform = static_transformStamped_1.transform;
-
-	tf2_static_broadcaster.sendTransform(static_transformStamped_1);
-  tf2_static_broadcaster.sendTransform(static_transformStamped_2);
-
   // sleep here so tf buffer can get populated
   ros::Duration(1).sleep(); // sleep for 1 second
 }

@@ -18,6 +18,9 @@
 		<arg name="log_output" value="$(arg log_output)" />
 	</include>
 
+	<node pkg="tf" type="static_transform_publisher" name="vislam_mavros_broadcaster_ned" args="0 0 0 0 0 3.14159265359 vislam local_origin_ned 10" />
+	<node pkg="tf" type="static_transform_publisher" name="vislam_mavros_broadcaster_fcu" args="0 0 0 0 0 3.14159265359 vislam fcu_frd 10" />
+
   <node pkg="snapdragon_mavros_vislam" type="snap_vislam_node" name="snap_vislam_node" output="screen">
       <!-- <rosparam file="$(find rpg_qualcomm_vislam)/parameters/default.yaml"/> -->
   	<remap from="vislam/odometry" to="mavros/odometry/odom"/>
