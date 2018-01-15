@@ -75,7 +75,7 @@ void Snapdragon::VislamManager::ImuCallback(
 
   // Parse IMU message
   float lin_acc[3], ang_vel[3];
-  
+
   // Convert ENU to NED coordinates
   lin_acc[0] = msg->linear_acceleration.x;
   lin_acc[1] = msg->linear_acceleration.y;
@@ -221,10 +221,9 @@ int32_t Snapdragon::VislamManager::GetPointCloud( mvVISLAMMapPoint* points, uint
   return mvVISLAM_GetPointCloud( vislam_ptr_, points, max_points );
 }
 
-bool Snapdragon::VislamManager::HasUpdatedPointCloud() {
-  std::lock_guard<std::mutex> lock( sync_mutex_);
-  int32_t mv_ret = mvVISLAM_HasUpdatedPointCloud( vislam_ptr_ );
-  return (mv_ret != 0 );
+int32_t Snapdragon::VislamManager::HasUpdatedPointCloud() {
+  std::lock_guard<std::mutex> lock( sync_mutex_ );
+  return mvVISLAM_HasUpdatedPointCloud(vislam_ptr_);
 }
 
 int32_t Snapdragon::VislamManager::GetPose( mvVISLAMPose& pose, int64_t& pose_frame_id, uint64_t& timestamp_ns ) {

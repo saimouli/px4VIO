@@ -114,12 +114,11 @@ public:
 
   /**
    * This is wrapper for the MVSDK's vislam API.  Provides information
-   * if there is an updated PointCloud.
-   * @return bool
-   *  true  = if it has updated point cloud
-   *  false = otherwise
+   * on how many features have been updated in the PointCloud.
+   * @return int32_t
+   *  # features being tracked
    **/
-  bool HasUpdatedPointCloud();
+  int32_t HasUpdatedPointCloud();
 
   /**
    * MV SDK's wrapper to get the Pose Information.
