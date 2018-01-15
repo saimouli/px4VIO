@@ -93,7 +93,7 @@ public:
 private:
   // class methods
   int32_t PublishVislamData(mvVISLAMPose& vislamPose, int64_t vislamFrameId,
-                            uint64_t timestamp_ns);
+                            uint64_t timestamp_ns, int32_t num_tracked_points);
   void ThreadMain();
 
   // data members;

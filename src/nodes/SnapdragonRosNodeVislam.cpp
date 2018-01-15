@@ -41,6 +41,8 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/buffer.h>
 
+#define MIN_NUM_FEATURES 20
+
 Snapdragon::RosNode::Vislam::Vislam( ros::NodeHandle nh ) : nh_(nh)
 {
   pub_vislam_pose_ = nh_.advertise<geometry_msgs::PoseStamped>("vislam/pose",1);
@@ -190,12 +192,16 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
   int32_t vislam_ret;
   while( !thread_stop_ ) {
     vislam_ret = vislam_man.GetPose( vislamPose, vislamFrameId, timestamp_ns );
+
+    // get the total number of tracked points
+    int32_t num_tracked_points = vislam_man.HasUpdatedPointCloud();
+
     if( vislam_ret == 0 ) {
       //check if the pose quality is good.  If not do not publish the data.
       if( vislamPose.poseQuality != MV_TRACKING_STATE_FAILED  &&
           vislamPose.poseQuality != MV_TRACKING_STATE_INITIALIZING ) {
           // Publish Pose Data
-          PublishVislamData( vislamPose, vislamFrameId, timestamp_ns );
+          PublishVislamData( vislamPose, vislamFrameId, timestamp_ns, num_tracked_points );
       }
 
       // Log changes in tracking state
@@ -233,7 +239,8 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
   return;
 }
 
-int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose, int64_t vislamFrameId, uint64_t timestamp_ns  ) {
+int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose, int64_t vislamFrameId,
+                                                        uint64_t timestamp_ns, int32_t num_tracked_points ) {
   geometry_msgs::PoseStamped pose_msg;
   ros::Time frame_time;
   frame_time.sec = (int32_t)(timestamp_ns/1000000000UL);
@@ -306,7 +313,10 @@ int32_t Snapdragon::RosNode::Vislam::PublishVislamData( mvVISLAMPose& vislamPose
   //set the error covariance for the pose.
   for( int16_t i = 0; i < 6; i++ ) {
     for( int16_t j = 0; j < 6; j++ ) {
-      odom_msg.pose.covariance[ i*6 + j ] = vislamPose.errCovPose[i][j];
+      if (num_tracked_points > MIN_NUM_FEATURES)
+        odom_msg.pose.covariance[ i*6 + j ] = vislamPose.errCovPose[i][j];
+      else
+        odom_msg.pose.covariance[ i*6 + j ] = 10001.0f;
     }
   }
 
