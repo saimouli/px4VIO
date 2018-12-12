@@ -122,10 +122,14 @@ namespace Snapdragon {
   struct CameraParameters {
     CameraParameters() {
       verbose = false;
-      enable_cpa = 0;
+      enable_cpa = false;
       // not initializing the camera_config variable as it has the constructor.
       std::memset(&mv_camera_config, 0, sizeof(mvCameraConfiguration));
-      std::memset(&mv_cpa_config, 0, sizeof(mvCPA_Configuration));
+      mv_cpa_config.width = 0;
+      mv_cpa_config.width = 0;
+      mv_cpa_config.format = MVCPA_FORMAT_GRAY8;
+      mv_cpa_config.cpaType = MVCPA_MODE_LEGACY;
+      // use default legacyCost and histogram have default values
     }
 
     bool enable_cpa;

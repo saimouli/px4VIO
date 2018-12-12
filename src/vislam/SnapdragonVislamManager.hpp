@@ -69,12 +69,16 @@ public:
     float32_t stdGyroMeasNoise;
     float32_t stdCamNoise;
     float32_t minStdPixelNoise;
-    bool      failHighPixelNoisePoints;
+    float32_t failHighPixelNoiseScaleFactor;
     float32_t logDepthBootstrap;
     bool      useLogCameraHeight;
     float32_t logCameraHeightBootstrap;
     bool      noInitWhenMoving;
     float32_t limitedIMUbWtrigger;
+    const char* staticMaskFileName;
+    float32_t gpsImuTimeAlignment;
+    float32_t tba[3];
+    bool      mapping;
   } InitParams;
 
   /**

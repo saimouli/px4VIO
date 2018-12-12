@@ -147,7 +147,7 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
 
   vislamParams.stdCamNoise = 100;
   vislamParams.minStdPixelNoise = 0.5;
-  vislamParams.failHighPixelNoisePoints = false;
+  vislamParams.failHighPixelNoiseScaleFactor = 1.6651f;
 
   vislamParams.logDepthBootstrap = 0;
   vislamParams.useLogCameraHeight = false;
@@ -155,8 +155,15 @@ void Snapdragon::RosNode::Vislam::ThreadMain() {
   vislamParams.noInitWhenMoving = true;
   vislamParams.limitedIMUbWtrigger = 35.0;
 
+  vislamParams.staticMaskFileName = nullptr;
+  vislamParams.gpsImuTimeAlignment = 0.0;
+  vislamParams.tba[0] = 0.0;
+  vislamParams.tba[1] = 0.0;
+  vislamParams.tba[2] = 0.0;
+  vislamParams.mapping = false;
+
   Snapdragon::CameraParameters param;
-  param.enable_cpa = 1;
+  param.enable_cpa = true;
   param.camera_config.fps = 30;
   param.camera_config.cam_type = Snapdragon::CameraType::OPTIC_FLOW;
   param.mv_camera_config = config;

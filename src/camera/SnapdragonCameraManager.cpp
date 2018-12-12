@@ -139,8 +139,12 @@ int32_t Snapdragon::CameraManager::Initialize(){
       }
     }
 
-    snap_camera_param_ptr_->mv_cpa_config.legacyCost.startExposure = camera_config_ptr_->exposure;
-    snap_camera_param_ptr_->mv_cpa_config.legacyCost.startGain = camera_config_ptr_->gain;
+    auto& mv_cpa_config = snap_camera_param_ptr_->mv_cpa_config;
+    mv_cpa_config.legacyCost.startExposure = camera_config_ptr_->exposure;
+    mv_cpa_config.legacyCost.startGain = camera_config_ptr_->gain;
+    mv_cpa_config.width = camera_config_ptr_->pixel_width;
+    mv_cpa_config.height = camera_config_ptr_->pixel_height;
+    mv_cpa_config.format = MVCPA_FORMAT_GRAY8;
 
     if (snap_camera_param_ptr_->enable_cpa) {
       mvCPA_ptr_ = mvCPA_Initialize(&snap_camera_param_ptr_->mv_cpa_config);
@@ -220,8 +224,6 @@ int32_t Snapdragon::CameraManager::Stop() {
 void Snapdragon::CameraManager::UpdateGainAndExposure()
 {
   mvCPA_AddFrame(mvCPA_ptr_, frame_queue_[frame_q_write_index_].second->data,
-      camera_config_ptr_->pixel_width,
-      camera_config_ptr_->pixel_height,
       camera_config_ptr_->memory_stride);
 
   float cpa_exposure, cpa_gain;

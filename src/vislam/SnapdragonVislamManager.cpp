@@ -58,6 +58,13 @@ void Snapdragon::VislamManager::ImuCallback(
   // Sanity check on IMU timestamp
   if (last_timestamp != 0)
   {
+    if (current_timestamp_ns < last_timestamp)
+    {
+      ROS_WARN_STREAM_THROTTLE(1, "Bad IMU timestamp order, dropping data [ns]\t"
+        << last_timestamp << " " << current_timestamp_ns);
+      return;
+    }
+
     delta = (current_timestamp_ns - last_timestamp) * 1e-6;
     const float imu_sample_dt_reasonable_threshold_ms = 2.5;
     if (delta > imu_sample_dt_reasonable_threshold_ms)
@@ -162,10 +169,14 @@ int32_t Snapdragon::VislamManager::Initialize
       vislam_params_.std0Tbc, vislam_params_.std0Ombc, vislam_params_.std0Delta,
       vislam_params_.accelMeasRange, vislam_params_.gyroMeasRange,
       vislam_params_.stdAccelMeasNoise, vislam_params_.stdGyroMeasNoise,
-      vislam_params_.stdCamNoise, vislam_params_.minStdPixelNoise, vislam_params_.failHighPixelNoisePoints,
+      vislam_params_.stdCamNoise, vislam_params_.minStdPixelNoise, vislam_params_.failHighPixelNoiseScaleFactor,
       vislam_params_.logDepthBootstrap, vislam_params_.useLogCameraHeight, vislam_params_.logCameraHeightBootstrap,
       vislam_params_.noInitWhenMoving,
-      vislam_params_.limitedIMUbWtrigger
+      vislam_params_.limitedIMUbWtrigger,
+      vislam_params_.staticMaskFileName,
+      vislam_params_.gpsImuTimeAlignment,
+      vislam_params_.tba,
+      vislam_params_.mapping
     );
     if( vislam_ptr_ == nullptr ) {
       rc = -1;

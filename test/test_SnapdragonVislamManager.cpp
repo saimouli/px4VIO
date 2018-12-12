@@ -209,13 +209,20 @@ int main( int argc, char** argv ) {
 
   vislamParams.stdCamNoise = 100;
   vislamParams.minStdPixelNoise = 0.5;
-  vislamParams.failHighPixelNoisePoints = false;
+  vislamParams.failHighPixelNoiseScaleFactor = 1.6651f;
 
   vislamParams.logDepthBootstrap = 0;
   vislamParams.useLogCameraHeight = false;
   vislamParams.logCameraHeightBootstrap = -3.22;
   vislamParams.noInitWhenMoving = true;
   vislamParams.limitedIMUbWtrigger = 35.0;
+
+  vislamParams.staticMaskFileName = nullptr;
+  vislamParams.gpsImuTimeAlignment = 0.0;
+  vislamParams.tba[0] = 0.0;
+  vislamParams.tba[1] = 0.0;
+  vislamParams.tba[2] = 0.0;
+  vislamParams.mapping = false;
 
   Snapdragon::CameraParameters param;
   param.enable_cpa = 1;
